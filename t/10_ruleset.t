@@ -6,13 +6,29 @@ use Linux::Landlock::Ruleset;
 use Data::Dumper;
 use IO::File;
 use IO::Dir;
+use IO::Socket::INET;
 
 my $ruleset = Linux::Landlock::Ruleset->new();
 ok($ruleset->allow_perl_inc_access(), "allow_perl_inc_access");
 ok($ruleset->add_path_rule('data', qw(read_file)), "allow read_file in data");
 ok($ruleset->add_path_rule('/usr', qw(execute read_file)), "allow read_file + execute in /usr");
 ok($ruleset->allow_std_dev_access(), "allow_std_dev_access");
+ok($ruleset->add_net_rule(33333,'bind_tcp'), "allow port 33333");
 ok($ruleset->apply(), "apply ruleset");
+ok(
+    defined IO::Socket::INET->new(
+        LocalPort => 33333,
+        Proto     => 'tcp',
+    ),
+    "socket created"
+);
+ok(
+    !defined IO::Socket::INET->new(
+        LocalPort => 33334,
+        Proto     => 'tcp',
+    ),
+    "socket not created: $!"
+);
 for (@INC) {
     ok(IO::Dir->new($_), "opendir $_");
 }
