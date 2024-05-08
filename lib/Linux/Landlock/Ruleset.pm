@@ -85,6 +85,15 @@ This should usually not be changed.
 
 =back
 
+=head1 AUTHOR
+
+Marc Ballarin, <ballarin.marc@gmx.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
 =cut
 
 use strict;
