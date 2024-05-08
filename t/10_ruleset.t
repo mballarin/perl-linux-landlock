@@ -11,10 +11,10 @@ use IO::Socket::INET;
 my $ruleset = Linux::Landlock::Ruleset->new();
 my $abi_version = $ruleset->get_abi_version();
 ok($ruleset->allow_perl_inc_access(), "allow_perl_inc_access");
-ok($ruleset->add_path_rule('data', qw(read_file)), "allow read_file in data");
-ok($ruleset->add_path_rule('/usr', qw(execute read_file)), "allow read_file + execute in /usr");
+ok($ruleset->add_path_beneath_rule('data', qw(read_file)), "allow read_file in data");
+ok($ruleset->add_path_beneath_rule('/usr', qw(execute read_file)), "allow read_file + execute in /usr");
 ok($ruleset->allow_std_dev_access(), "allow_std_dev_access");
-ok($ruleset->add_net_rule(33333,'bind_tcp'), "allow port 33333") if $abi_version >= 4;
+ok($ruleset->add_net_port_rule(33333,'bind_tcp'), "allow port 33333") if $abi_version >= 4;
 ok($ruleset->apply(), "apply ruleset");
 if ($abi_version >= 4) {
     ok(
@@ -46,7 +46,7 @@ is(system('/usr/bin/cat data/a'), 0, "cat data/a is allowed...");
 is(system('/usr/bin/cat data/a > /dev/null'), 0, "... as is writing to /dev/null");
 my $ruleset2 = Linux::Landlock::Ruleset->new();
 ok($ruleset2->allow_perl_inc_access(), "allow_perl_inc_access");
-ok($ruleset2->add_path_rule('data/a', qw(read_file)), "allow read_file on data/a");
+ok($ruleset2->add_path_beneath_rule('data/a', qw(read_file)), "allow read_file on data/a");
 ok($ruleset2->apply(), "apply ruleset");
 ok(-r 'data/b', "technically readable: data/b");
 ok(!defined IO::File->new('data/b', 'r'), "no longer readable: data/b");
