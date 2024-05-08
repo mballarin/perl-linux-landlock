@@ -86,9 +86,8 @@ not be changed.
 
 use strict;
 use warnings;
-use List::Util qw(reduce);
-use IO::Dir;
-use IO::File;
+use POSIX                   ();
+use List::Util              qw(reduce);
 use Linux::Landlock::Direct qw(
   %LANDLOCK_RULE
   %LANDLOCK_ACCESS_FS
@@ -129,12 +128,21 @@ sub get_abi_version {
 
 sub add_path_rule {
     my ($self, $path, @allowed) = @_;
-    $self->{_fs_fd} = ll_create_fs_ruleset(@{ $self->{handled_fs_actions} })
-      or die "Failed to create ruleset: $!\n"
-      unless defined $self->{_fs_fd};
-    if (my $fh = -d $path ? IO::Dir->new($path) : IO::File->new($path)) {
+
+    unless (defined $self->{_fs_fd}) {
+        $self->{_fs_fd} = ll_create_fs_ruleset(@{ $self->{handled_fs_actions} })
+          or die "Failed to create ruleset: $!\n";
+    }
+    my $is_dir = -d $path;
+    if (my $fd = $is_dir ? POSIX::opendir($path) : POSIX::open($path)) {
         my $allowed = reduce { $a | $b } map { $LANDLOCK_ACCESS_FS{ uc $_ } } @allowed;
-        ll_add_fs_rule($self->{_fs_fd}, $allowed, $fh) or die "Failed to add rule: $!\n";
+        my $result  = ll_add_fs_rule($self->{_fs_fd}, $allowed, $fd);
+        if ($is_dir) {
+            POSIX::closedir($fd);
+        } else {
+            POSIX::close($fd);
+        }
+        die "Failed to add rule: $!\n" unless $result;
         return 1;
     } else {
         die "Failed to open $path: $!\n";
@@ -143,9 +151,10 @@ sub add_path_rule {
 
 sub add_net_rule {
     my ($self, $port, @allowed) = @_;
-    $self->{_net_fd} = ll_create_net_ruleset(@{ $self->{handled_net_actions} })
-      or die "Failed to create ruleset: $!\n"
-      unless defined $self->{_net_fd};
+    unless (defined $self->{_net_fd}) {
+        $self->{_net_fd} = ll_create_net_ruleset(@{ $self->{handled_net_actions} })
+          or die "Failed to create ruleset: $!\n";
+    }
     my $allowed = reduce { $a | $b } map { $LANDLOCK_ACCESS_NET{ uc $_ } } @allowed;
     ll_add_net_rule($self->{_net_fd}, $allowed, $port) or die "Failed to add rule: $!\n";
     return 1;
@@ -168,6 +177,13 @@ sub allow_std_dev_access {
         $self->add_path_rule("/dev/$_", qw(read_file write_file));
     }
     return 1;
+}
+
+sub DESTROY {
+    my ($self) = @_;
+    POSIX::close($self->{_fs_fd})  if defined $self->{_fs_fd};
+    POSIX::close($self->{_net_fd}) if defined $self->{_net_fd};
+    return;
 }
 
 1;
