@@ -117,6 +117,9 @@ my %max_fs_supported = (
 
 my %max_net_supported = (
     -1 => 0,
+    1  => 0,
+    2  => 0,
+    3  => 0,
     4  => $LANDLOCK_ACCESS_NET{CONNECT_TCP},
 );
 
@@ -139,7 +142,7 @@ sub _get_syscall_numbers {
             landlock_create_ruleset => 444,
             landlock_add_rule       => 445,
             landlock_restrict_self  => 446,
-            prctl                   => $arch =~ /arm/ ? 167 : 157,
+            prctl                   => $arch =~ /arm/ ? 172 : 157,
         );
     }
 }
@@ -177,8 +180,11 @@ sub ll_create_net_ruleset {
 sub _ll_create_ruleset {
     my ($fs_actions, $net_actions) = @_;
 
-    my $allowed = pack('QQ', (reduce { $a | $b } @$fs_actions), (reduce { $a | $b } @$net_actions));
-    my $fd      = syscall($SYS{landlock_create_ruleset}, $allowed, length $allowed, 0);
+    my $allowed = pack('Q', reduce { $a | $b } @$fs_actions);
+    if (ll_get_abi_version >= 4) {
+        $allowed .= pack('Q', reduce { $a | $b } @$net_actions);
+    }
+    my $fd = syscall($SYS{landlock_create_ruleset}, $allowed, length $allowed, 0);
     if ($fd >= 0) {
         return $fd;
     } else {
@@ -188,12 +194,10 @@ sub _ll_create_ruleset {
 
 sub ll_add_fs_rule {
     my ($ruleset_fd, $allowed_access, $parent) = @_;
+
     my $fd = ref $parent ? fileno $parent : $parent;
-    my $result = syscall(
-        $SYS{landlock_add_rule}, $ruleset_fd,
-        $LANDLOCK_RULE{PATH_BENEATH},
-        pack('Ql', $allowed_access, $fd), 0
-    );
+    my $result =
+      syscall($SYS{landlock_add_rule}, $ruleset_fd, $LANDLOCK_RULE{PATH_BENEATH}, pack('Ql', $allowed_access, $fd), 0);
     return ($result == 0) ? 1 : undef;
 }
 

@@ -9,27 +9,31 @@ use IO::Dir;
 use IO::Socket::INET;
 
 my $ruleset = Linux::Landlock::Ruleset->new();
+my $abi_version = $ruleset->get_abi_version();
 ok($ruleset->allow_perl_inc_access(), "allow_perl_inc_access");
 ok($ruleset->add_path_rule('data', qw(read_file)), "allow read_file in data");
 ok($ruleset->add_path_rule('/usr', qw(execute read_file)), "allow read_file + execute in /usr");
 ok($ruleset->allow_std_dev_access(), "allow_std_dev_access");
-ok($ruleset->add_net_rule(33333,'bind_tcp'), "allow port 33333");
+ok($ruleset->add_net_rule(33333,'bind_tcp'), "allow port 33333") if $abi_version >= 4;
 ok($ruleset->apply(), "apply ruleset");
-ok(
-    defined IO::Socket::INET->new(
-        LocalPort => 33333,
-        Proto     => 'tcp',
-    ),
-    "socket created"
-);
-ok(
-    !defined IO::Socket::INET->new(
-        LocalPort => 33334,
-        Proto     => 'tcp',
-    ),
-    "socket not created: $!"
-);
+if ($abi_version >= 4) {
+    ok(
+        defined IO::Socket::INET->new(
+            LocalPort => 33333,
+            Proto     => 'tcp',
+        ),
+        "socket created"
+    );
+    ok(
+        !defined IO::Socket::INET->new(
+            LocalPort => 33334,
+            Proto     => 'tcp',
+        ),
+        "socket not created: $!"
+    );
+}
 for (@INC) {
+    next unless -d $_;
     ok(IO::Dir->new($_), "opendir $_");
 }
 for (qw(/ /var)) {
@@ -49,6 +53,7 @@ ok(!defined IO::File->new('data/b', 'r'), "no longer readable: data/b");
 ok(defined IO::File->new('data/a', 'r'), "still readable: data/a...");
 is(system('/usr/bin/cat data/a'), -1, "...but no permission to run cat");
 for (@INC) {
+    next unless -d $_;
     ok(IO::Dir->new($_), "opendir $_");
 }
 done_testing();

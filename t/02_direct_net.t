@@ -10,7 +10,7 @@ use IO::Socket::INET;
 my $abi_version = ll_get_abi_version();
 
 if ($abi_version < 4) {
-    BAIL_OUT("Landlock network functionality not available");
+    plan skip_all => "Landlock network functionality not available";
 }
 ok(scalar ll_all_net_access_supported() >= 2, "plausible list");
 my $ruleset_fd = ll_create_net_ruleset();
