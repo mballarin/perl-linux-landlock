@@ -57,7 +57,7 @@ use warnings;
 use Exporter 'import';
 use List::Util qw(reduce);
 use Config;
-
+use POSIX qw();
 # adapted from linux/landlock.ph, architecture independent consts
 my $LANDLOCK_CREATE_RULESET_VERSION = (1 << 0);
 our %LANDLOCK_ACCESS_FS = (
@@ -187,11 +187,12 @@ sub _ll_create_ruleset {
 }
 
 sub ll_add_fs_rule {
-    my ($ruleset_fd, $allowed_access, $parent_fh) = @_;
+    my ($ruleset_fd, $allowed_access, $parent) = @_;
+    my $fd = ref $parent ? fileno $parent : $parent;
     my $result = syscall(
         $SYS{landlock_add_rule}, $ruleset_fd,
         $LANDLOCK_RULE{PATH_BENEATH},
-        pack('Ql', $allowed_access, fileno $parent_fh), 0
+        pack('Ql', $allowed_access, $fd), 0
     );
     return ($result == 0) ? 1 : undef;
 }
