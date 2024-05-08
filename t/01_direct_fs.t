@@ -20,7 +20,7 @@ my $writable_fh = IO::File->new('data/b', 'r');
 ok(
     ll_add_fs_rule(
         $ruleset_fd,
-        $LANDLOCK_ACCESS_FS{READ_FILE} | $LANDLOCK_ACCESS_FS{WRITE_FILE} | $LANDLOCK_ACCESS_FS{TRUNCATE}, $writable_fh
+        $LANDLOCK_ACCESS_FS{READ_FILE} | $LANDLOCK_ACCESS_FS{WRITE_FILE}, $writable_fh
     ),
     'rule added'
 );
@@ -30,9 +30,9 @@ ok(!defined ll_add_fs_rule(fileno(*STDIN), $LANDLOCK_ACCESS_FS{READ_FILE}, $dh),
 ok(!defined ll_restrict_self($ruleset_fd),                                       "no_new_privs not set: $!");
 ok(set_no_new_privs(),                                                           "no_new_privs set");
 ok(ll_restrict_self($ruleset_fd),                                                "successfully restricted");
-ok(IO::File->new('data/a', 'r'),                                                 'can read from file in data');
-ok(!IO::File->new('data/a', 'w'),                                                'cannot write to file in data');
-ok(!IO::File->new($0, 'r'),                                                      'cannot read file outside of data');
-ok(IO::File->new('data/b', 'r'),                                                 'can read from other file in data');
-ok(IO::File->new('data/b', 'w'),                                                 'can write to other file in data');
+ok(IO::File->new('data/a', '<'),                                                 'can read from file in data');
+ok(!IO::File->new('data/a', '>>'),                                                'cannot write to file in data');
+ok(!IO::File->new($0, '<'),                                                      'cannot read file outside of data');
+ok(IO::File->new('data/b', '<'),                                                 'can read from other file in data');
+ok(IO::File->new('data/b', '>>'),                                                 'can write to other file in data');
 done_testing();
