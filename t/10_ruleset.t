@@ -3,19 +3,21 @@ use strict;
 use warnings;
 use Test::More;
 use Linux::Landlock::Ruleset;
-use Data::Dumper;
 use IO::File;
 use IO::Dir;
 use IO::Socket::INET;
+use File::Basename;
 
+my $base = dirname(__FILE__) . '/data';
 my $ruleset = Linux::Landlock::Ruleset->new();
 my $abi_version = $ruleset->get_abi_version();
 ok($ruleset->allow_perl_inc_access(), "allow_perl_inc_access");
-ok($ruleset->add_path_beneath_rule('data', qw(read_file)), "allow read_file in data");
+ok($ruleset->add_path_beneath_rule($base, qw(read_file)), "allow read_file in $base");
 ok($ruleset->add_path_beneath_rule('/usr', qw(execute read_file)), "allow read_file + execute in /usr");
 ok($ruleset->allow_std_dev_access(), "allow_std_dev_access");
 ok($ruleset->add_net_port_rule(33333,'bind_tcp'), "allow port 33333") if $abi_version >= 4;
 ok($ruleset->apply(), "apply ruleset");
+ok(eval { require Data::Dumper; }, "require Data::Dumper");
 if ($abi_version >= 4) {
     ok(
         defined IO::Socket::INET->new(
@@ -40,18 +42,21 @@ for (qw(/ /var)) {
     ok(-r $_, "technically readable: $_");
     ok(!defined IO::Dir->new($_), "opendir $_ failed");
 }
-ok(defined IO::File->new('data/a', 'r'), "readable: data/a");
-ok(defined IO::File->new('data/b', 'r'), "readable: data/b");
-is(system('/usr/bin/cat data/a'), 0, "cat data/a is allowed...");
-is(system('/usr/bin/cat data/a > /dev/null'), 0, "... as is writing to /dev/null");
+ok(defined IO::File->new("$base/a", 'r'), "readable: $base/a");
+ok(defined IO::File->new("$base/b", 'r'), "readable: $base/b");
+is(system("/usr/bin/cat $base/a"), 0, "cat $base/a is allowed...");
+is(system("/usr/bin/cat $base/a > /dev/null"), 0, "... as is writing to /dev/null");
 my $ruleset2 = Linux::Landlock::Ruleset->new();
 ok($ruleset2->allow_perl_inc_access(), "allow_perl_inc_access");
-ok($ruleset2->add_path_beneath_rule('data/a', qw(read_file)), "allow read_file on data/a");
+ok($ruleset2->add_path_beneath_rule("$base/a", qw(read_file)), "allow read_file on $base/a");
 ok($ruleset2->apply(), "apply ruleset");
-ok(-r 'data/b', "technically readable: data/b");
-ok(!defined IO::File->new('data/b', 'r'), "no longer readable: data/b");
-ok(defined IO::File->new('data/a', 'r'), "still readable: data/a...");
-is(system('/usr/bin/cat data/a'), -1, "...but no permission to run cat");
+ok(-r "$base/b", "technically readable: $base/b");
+# this fails if . was added to @INC
+if (! grep  { '.' } @INC) {
+    ok(!defined IO::File->new("$base/b", 'r'), "no longer readable: $base/b");
+}
+ok(defined IO::File->new("$base/a", 'r'), "still readable: $base/a...");
+is(system("/usr/bin/cat $base/a"), -1, "...but no permission to run cat");
 for (@INC) {
     next unless -d $_;
     ok(IO::Dir->new($_), "opendir $_");
