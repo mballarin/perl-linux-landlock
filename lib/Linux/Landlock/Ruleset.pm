@@ -4,6 +4,13 @@ package Linux::Landlock::Ruleset;
 
 Linux::Landlock::Ruleset - A higher level interface to the Linux Landlock API
 
+=head1 DESCRIPTION
+
+This module provides an object-oriented interface to the Linux Landlock API.
+It uses the lower-level interface provided by L<Linux::Landlock::Direct>.
+
+See L<https://docs.kernel.org/userspace-api/landlock.html> for more information about Landlock.
+
 =head1 SYNOPSIS
 
       use Linux::Landlock::Ruleset;
@@ -59,6 +66,8 @@ Possible access rights are:
     refer
     truncate
 
+See  L<https://docs.kernel.org/userspace-api/landlock.html> for all possible access rights.
+
 =item add_net_port_rule($port, @allowed)
 
 Add a rule to the ruleset that allows the specified access to the given port.
@@ -85,6 +94,15 @@ This should usually not be changed.
 
 =back
 
+=head1 LIMITATIONS
+
+This module requires a Linux system supporting the Landlock functionality. As of
+2024, this is the case for almost all distributions, however, the version of the
+available Landlock ABI varies.
+
+Notably, the C<TRUNCATE> access right is only supported by the kernel since ABI
+version 3 (kernel version 6.2 or newer, unless backported).
+
 =head1 AUTHOR
 
 Marc Ballarin, <ballarin.marc@gmx.de>
@@ -101,7 +119,6 @@ use warnings;
 use POSIX                   ();
 use List::Util              qw(reduce);
 use Linux::Landlock::Direct qw(
-  %LANDLOCK_RULE
   %LANDLOCK_ACCESS_FS
   %LANDLOCK_ACCESS_NET
   ll_add_path_beneath_rule

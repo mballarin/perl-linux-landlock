@@ -7,7 +7,7 @@ Linux::Landlock::Direct - Direct, low-level interface to the Linux Landlock API
 =head1 DESCRIPTION
 
 This module provides a functional interface to the Linux Landlock API.
-It is a thin wrapper around the Landlock system calls.
+It is a relatively thin wrapper around the Landlock system calls.
 
 See L<Linux::Landlock::Ruleset> for a higher-level OO and exception based interface.
 
@@ -29,7 +29,7 @@ See L<https://docs.kernel.org/userspace-api/landlock.html> for more information 
     # NO_NEW_PRIVS is required for ll_restrict_self() to work, it can be set by any means, e.g. inherited or
     # set via some other module; this implementation just exists for convenience
     set_no_new_privs();
-    # apply the ruleset to the current process and its children. This cannot be undone.
+    # apply the ruleset to the current process and future children. This cannot be undone.
     ll_restrict_self($ruleset_fd);
 
 =head1 FUNCTIONS
@@ -58,8 +58,8 @@ This requires an ABI version of at least 4.
 
 =item ll_create_ruleset($fs_actions, $net_actions)
 
-Int (file descriptor), creates a new Landlock ruleset that can covers both file system
-and network actions.
+Int (file descriptor), creates a new Landlock ruleset that can cover file system
+and network actions at the same time.
 
 =item ll_add_path_beneath_rule($ruleset_fd, $allowed_access, $parent)
 
@@ -146,6 +146,8 @@ C<%LANDLOCK_RULE>
     PATH_BENEATH
     NET_PORT
 
+See L<https://docs.kernel.org/userspace-api/landlock.html> for more information.
+
 =item set_no_new_privs
 
 The C<set_no_new_privs> helper function.
@@ -198,6 +200,7 @@ our %LANDLOCK_RULE = (
 );
 our @EXPORT_OK = qw(
   ll_get_abi_version
+  ll_create_ruleset
   ll_create_fs_ruleset
   ll_create_net_ruleset
   ll_add_path_beneath_rule
@@ -215,14 +218,14 @@ our %EXPORT_TAGS = (
     constants => [grep { /^%/x } @EXPORT_OK],
 );
 
-my %max_fs_supported = (
+my %MAX_FS_SUPPORTED = (
     -1 => 0,
     1  => $LANDLOCK_ACCESS_FS{MAKE_SYM},
     2  => $LANDLOCK_ACCESS_FS{REFER},
     3  => $LANDLOCK_ACCESS_FS{TRUNCATE},
 );
 
-my %max_net_supported = (
+my %MAX_NET_SUPPORTED = (
     -1 => 0,
     1  => 0,
     2  => 0,
@@ -253,7 +256,10 @@ sub _nr {
                 prctl                   => $arch =~ /arm/ ? 172 : 157,
             );
         } else {
-            die "Could not load header file and got no hardcoded syscall numbers for '$arch'\n";
+            die <<"MSG";
+Could not load header files and got no hardcoded syscall numbers for '$arch'.
+Either generate headers via 'h2ph' or add the syscall numbers for your architecture to the module.
+MSG
         }
     }
     return $SYS{$name};
@@ -262,13 +268,13 @@ sub _nr {
 sub ll_all_fs_access_supported {
     my $version = ll_get_abi_version();
     $version = 3 if $version > 3;
-    return grep { $_ <= $max_fs_supported{$version} } values %LANDLOCK_ACCESS_FS;
+    return grep { $_ <= $MAX_FS_SUPPORTED{$version} } values %LANDLOCK_ACCESS_FS;
 }
 
 sub ll_all_net_access_supported {
     my $version = ll_get_abi_version();
     $version = 4 if $version > 4;
-    return grep { $_ <= $max_net_supported{$version} } values %LANDLOCK_ACCESS_NET;
+    return grep { $_ <= $MAX_NET_SUPPORTED{$version} } values %LANDLOCK_ACCESS_NET;
 }
 
 sub ll_get_abi_version {
@@ -310,8 +316,7 @@ sub ll_add_path_beneath_rule {
 
     my $fd = ref $parent ? fileno $parent : $parent;
     my $result =
-      syscall(_nr('landlock_add_rule'), $ruleset_fd, $LANDLOCK_RULE{PATH_BENEATH}, pack('Ql', $allowed_access, $fd),
-        0);
+      syscall(_nr('landlock_add_rule'), $ruleset_fd, $LANDLOCK_RULE{PATH_BENEATH}, pack('Ql', $allowed_access, $fd), 0);
     return ($result == 0) ? 1 : undef;
 }
 
