@@ -83,12 +83,13 @@ Possible operations are:
 A convenience method that adds rules to allow reading files and directories in
 all directories in C<@INC>.
 
-=item new([handled_actions => \@actions])
+=item new([handled_fs_actions => \@fs_actions, handled_net_actions => \@net_actions
 
 Create a new L<Linux::Landlock::Ruleset> instance.
 
-C<handled_actions> restricts the set of actions that can be used in rules and that
-will be prevented if not allowed by any rule.
+C<handled_fs_actions> and C<handled_net_actions> restrict the set of actions that
+can be used in rules and that will be prevented if not allowed by any rule.
+
 By default, all actions supported by the kernel and known to this module are covered.
 This should usually not be changed.
 
