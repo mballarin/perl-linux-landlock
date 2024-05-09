@@ -8,13 +8,22 @@ WriteMakefile(
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0
     },
-    DISTNAME      => 'Linux-Landlock',
-    LICENSE       => 'perl',
-    NAME          => 'Linux::Landlock',
-    PREREQ_PM     => {},
-    VERSION       => '0.500',
+    DISTNAME  => 'Linux-Landlock',
+    LICENSE   => 'perl',
+    NAME      => 'Linux::Landlock',
+    PREREQ_PM => {
+        'POSIX'      => 0,
+        'List::Util' => 0,
+        'Exporter'   => 0,
+        'Config'     => 0,
+    },
+    VERSION       => '0.100',
     TEST_REQUIRES => {
-        'Test::More' => '0.47'
+        'Test::More'       => 0,
+        'File::Basename'   => 0,
+        'IO::Dir'          => 0,
+        'IO::File'         => 0,
+        'IO::Socket::INET' => 0,
     },
     test => {
         TESTS => 't/*.t'
