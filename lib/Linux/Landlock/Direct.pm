@@ -168,7 +168,7 @@ use List::Util qw(reduce);
 use Config;
 use POSIX qw();
 
-our $VERSION = '0.100';
+our $VERSION = '0.1';
 # adapted from linux/landlock.ph, architecture independent consts
 my $LANDLOCK_CREATE_RULESET_VERSION = (1 << 0);
 our %LANDLOCK_ACCESS_FS = (
