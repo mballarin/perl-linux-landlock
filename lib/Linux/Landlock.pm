@@ -1,8 +1,8 @@
-package Linux::Landlock::Ruleset;
+package Linux::Landlock;
 
 =head1 NAME
 
-Linux::Landlock::Ruleset - A higher level interface to the Linux Landlock API
+Linux::Landlock - A higher level interface to the Linux Landlock API
 
 =head1 DESCRIPTION
 
@@ -23,9 +23,9 @@ about Landlock.
 
 =head1 SYNOPSIS
 
-      use Linux::Landlock::Ruleset;
+      use Linux::Landlock;
 
-      my $ruleset = Linux::Landlock::Ruleset->new();
+      my $ruleset = Linux::Landlock->new();
       $ruleset->add_path_rule('/etc/fstab', qw(read_file));
       $ruleset->add_net_rule(22222, qw(bind_tcp));
       $ruleset->apply();
@@ -95,7 +95,7 @@ all directories in C<@INC>.
 
 =item new([handled_fs_actions => \@fs_actions, handled_net_actions => \@net_actions])
 
-Create a new L<Linux::Landlock::Ruleset> instance.
+Create a new L<Linux::Landlock> instance.
 
 C<handled_fs_actions> and C<handled_net_actions> restrict the set of actions that
 can be used in rules and that will be prevented if not allowed by any rule.
@@ -144,7 +144,7 @@ use Linux::Landlock::Direct qw(
   ll_create_net_ruleset
   set_no_new_privs
 );
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 
 sub new {
     my ($class, %args) = @_;

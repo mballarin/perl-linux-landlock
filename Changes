@@ -1,3 +1,6 @@
+0.3    2024-05-10T00:39:49+02:00
+    - rename Linux::Landlock::Ruleset to Linux::Landlock
+
 0.2    2024-05-09T23:43:52+02:00
 
     - some packaging and metadata fixes

@@ -1,6 +1,6 @@
 # NAME
 
-Linux::Landlock::Ruleset - A higher level interface to the Linux Landlock API
+Linux::Landlock - A higher level interface to the Linux Landlock API
 
 # DESCRIPTION
 
@@ -21,9 +21,9 @@ about Landlock.
 
 # SYNOPSIS
 
-      use Linux::Landlock::Ruleset;
+      use Linux::Landlock;
 
-      my $ruleset = Linux::Landlock::Ruleset->new();
+      my $ruleset = Linux::Landlock->new();
       $ruleset->add_path_rule('/etc/fstab', qw(read_file));
       $ruleset->add_net_rule(22222, qw(bind_tcp));
       $ruleset->apply();
@@ -91,7 +91,7 @@ about Landlock.
 
 - new(\[handled\_fs\_actions => \\@fs\_actions, handled\_net\_actions => \\@net\_actions\])
 
-    Create a new [Linux::Landlock::Ruleset](https://metacpan.org/pod/Linux%3A%3ALandlock%3A%3ARuleset) instance.
+    Create a new [Linux::Landlock](https://metacpan.org/pod/Linux%3A%3ALandlock) instance.
 
     `handled_fs_actions` and `handled_net_actions` restrict the set of actions that
     can be used in rules and that will be prevented if not allowed by any rule.

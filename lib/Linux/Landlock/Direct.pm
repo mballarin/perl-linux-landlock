@@ -9,7 +9,7 @@ Linux::Landlock::Direct - Direct, low-level interface to the Linux Landlock API
 This module provides a functional interface to the Linux Landlock API.
 It is a relatively thin wrapper around the Landlock system calls.
 
-See L<Linux::Landlock::Ruleset> for a higher-level OO and exception based interface.
+See L<Linux::Landlock> for a higher-level OO and exception based interface.
 
 See L<https://docs.kernel.org/userspace-api/landlock.html> for more information about Landlock.
 
@@ -168,7 +168,7 @@ use List::Util qw(reduce);
 use Config;
 use POSIX qw();
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 # adapted from linux/landlock.ph, architecture independent consts
 my $LANDLOCK_CREATE_RULESET_VERSION = (1 << 0);
 our %LANDLOCK_ACCESS_FS = (

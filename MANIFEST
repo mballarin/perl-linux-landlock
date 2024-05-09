@@ -8,7 +8,7 @@ Makefile.PL
 README
 README.md
 lib/Linux/Landlock/Direct.pm
-lib/Linux/Landlock/Ruleset.pm
+lib/Linux/Landlock.pm
 t/01_direct_fs.t
 t/02_direct_net.t
 t/10_ruleset.t

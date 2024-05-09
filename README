@@ -1,6 +1,5 @@
 NAME
-    Linux::Landlock::Ruleset - A higher level interface to the Linux
-    Landlock API
+    Linux::Landlock - A higher level interface to the Linux Landlock API
 
 DESCRIPTION
     Landlock is a sandboxing feature specific to Linux that allows a process
@@ -20,9 +19,9 @@ DESCRIPTION
     information about Landlock.
 
 SYNOPSIS
-          use Linux::Landlock::Ruleset;
+          use Linux::Landlock;
 
-          my $ruleset = Linux::Landlock::Ruleset->new();
+          my $ruleset = Linux::Landlock->new();
           $ruleset->add_path_rule('/etc/fstab', qw(read_file));
           $ruleset->add_net_rule(22222, qw(bind_tcp));
           $ruleset->apply();
@@ -88,7 +87,7 @@ METHODS
 
     new([handled_fs_actions => \@fs_actions, handled_net_actions =>
     \@net_actions])
-     Create a new Linux::Landlock::Ruleset instance.
+     Create a new Linux::Landlock instance.
 
      "handled_fs_actions" and "handled_net_actions" restrict the set of
      actions that can be used in rules and that will be prevented if not
