@@ -12,3 +12,4 @@ t/02_direct_net.t
 t/10_ruleset.t
 t/data/a
 t/data/b
+.perltidyrc
