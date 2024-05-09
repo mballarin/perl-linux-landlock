@@ -1,15 +1,16 @@
-lib/Linux/Landlock/Direct.pm
-lib/Linux/Landlock/Ruleset.pm
+.perltidyrc
+CONTRIBUTING
 LICENSE
-Makefile.PL
 MANIFEST			This list of files
 META.json
 META.yml
+Makefile.PL
 README
 README.md
+lib/Linux/Landlock/Direct.pm
+lib/Linux/Landlock/Ruleset.pm
 t/01_direct_fs.t
 t/02_direct_net.t
 t/10_ruleset.t
 t/data/a
 t/data/b
-.perltidyrc
