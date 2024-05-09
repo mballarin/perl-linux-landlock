@@ -79,7 +79,7 @@ See [https://docs.kernel.org/userspace-api/landlock.html](https://docs.kernel.or
     A convenience method that adds rules to allow reading files and directories in
     all directories in `@INC`.
 
-- new(\[handled\_fs\_actions => \\@fs\_actions, handled\_net\_actions => \\@net\_actions
+- new(\[handled\_fs\_actions => \\@fs\_actions, handled\_net\_actions => \\@net\_actions\])
 
     Create a new [Linux::Landlock::Ruleset](https://metacpan.org/pod/Linux%3A%3ALandlock%3A%3ARuleset) instance.
 
@@ -103,6 +103,8 @@ version 3 (kernel version 6.2 or newer, unless backported).
 Marc Ballarin, <ballarin.marc@gmx.de>
 
 # COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Marc Ballarin
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

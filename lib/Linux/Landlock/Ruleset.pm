@@ -83,7 +83,7 @@ Possible operations are:
 A convenience method that adds rules to allow reading files and directories in
 all directories in C<@INC>.
 
-=item new([handled_fs_actions => \@fs_actions, handled_net_actions => \@net_actions
+=item new([handled_fs_actions => \@fs_actions, handled_net_actions => \@net_actions])
 
 Create a new L<Linux::Landlock::Ruleset> instance.
 
@@ -109,6 +109,8 @@ version 3 (kernel version 6.2 or newer, unless backported).
 Marc Ballarin, <ballarin.marc@gmx.de>
 
 =head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2024 by Marc Ballarin
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
