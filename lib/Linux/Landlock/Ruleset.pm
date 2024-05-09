@@ -144,7 +144,7 @@ use Linux::Landlock::Direct qw(
   ll_create_net_ruleset
   set_no_new_privs
 );
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 
 sub new {
     my ($class, %args) = @_;

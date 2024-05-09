@@ -17,8 +17,9 @@ WriteMakefile(
         'Exporter'   => 0,
         'Config'     => 0,
     },
-    VERSION       => '0.1',
+    VERSION       => '0.2',
     TEST_REQUIRES => {
+        'Test::Exception'  => 0,
         'Test::More'       => 0,
         'File::Basename'   => 0,
         'IO::Dir'          => 0,
@@ -29,6 +30,7 @@ WriteMakefile(
         TESTS => 't/*.t'
     },
     META_MERGE => {
+        osname      => 'linux',
         'meta-spec' => { version => 2 },
         resources   => {
             repository => {

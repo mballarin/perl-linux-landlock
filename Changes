@@ -1,0 +1,8 @@
+0.2    2024-05-09T23:43:52+02:00
+
+    - some packaging and metadata fixes
+    - add tests for network actions on kernels without support
+
+0.1    2024-05-09T22:10:40+02:00
+
+    - initial release
