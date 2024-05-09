@@ -79,12 +79,13 @@ See [https://docs.kernel.org/userspace-api/landlock.html](https://docs.kernel.or
     A convenience method that adds rules to allow reading files and directories in
     all directories in `@INC`.
 
-- new(\[handled\_actions => \\@actions\])
+- new(\[handled\_fs\_actions => \\@fs\_actions, handled\_net\_actions => \\@net\_actions
 
     Create a new [Linux::Landlock::Ruleset](https://metacpan.org/pod/Linux%3A%3ALandlock%3A%3ARuleset) instance.
 
-    `handled_actions` restricts the set of actions that can be used in rules and that
-    will be prevented if not allowed by any rule.
+    `handled_fs_actions` and `handled_net_actions` restrict the set of actions that
+    can be used in rules and that will be prevented if not allowed by any rule.
+
     By default, all actions supported by the kernel and known to this module are covered.
     This should usually not be changed.
 
