@@ -3,7 +3,6 @@
 use strict;
 use warnings;
 use Test::More;
-use Data::Dumper;
 use IO::File;
 use Linux::Landlock::Direct qw(:functions :constants set_no_new_privs);
 use IO::Socket::INET;

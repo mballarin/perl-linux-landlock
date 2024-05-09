@@ -6,10 +6,20 @@ Linux::Landlock::Ruleset - A higher level interface to the Linux Landlock API
 
 =head1 DESCRIPTION
 
+Landlock is a sandboxing feature specific to Linux that allows a process to
+restrict its own access to the file system.
+Since the restrictions are set at runtime, from within the process itself,
+you can take into account dynamic information, like log or file system spool
+locations defined in your current configuration.
+
+Once set, restrictions cannot be undone and they are inherited by all future
+child processes.
+
 This module provides an object-oriented interface to the Linux Landlock API.
 It uses the lower-level interface provided by L<Linux::Landlock::Direct>.
 
-See L<https://docs.kernel.org/userspace-api/landlock.html> for more information about Landlock.
+See L<https://docs.kernel.org/userspace-api/landlock.html> for more information
+about Landlock.
 
 =head1 SYNOPSIS
 
@@ -104,6 +114,8 @@ available Landlock ABI varies.
 Notably, the C<TRUNCATE> access right is only supported by the kernel since ABI
 version 3 (kernel version 6.2 or newer, unless backported).
 
+Network functionality is only available since ABI version 4.
+
 =head1 AUTHOR
 
 Marc Ballarin, <ballarin.marc@gmx.de>
@@ -132,6 +144,7 @@ use Linux::Landlock::Direct qw(
   ll_create_net_ruleset
   set_no_new_privs
 );
+our $VERSION = '0.100';
 
 sub new {
     my ($class, %args) = @_;
