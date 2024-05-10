@@ -24,23 +24,16 @@ if ($abi_version < 0) {
     } else {
         throws_ok(sub { $ruleset->add_net_port_rule(33333, 'bind_tcp') }, qr/desired/, "no network support");
     }
-    ok($ruleset->apply(),              "apply ruleset");
+    ok(defined IO::Dir->new("/"), "can opendir /");
+    ok($ruleset->apply(),         "apply ruleset");
+    ok(!defined IO::Dir->new("/"), "can no longer opendir /");
+    ok($!{EACCES},                 "correct error: $!");
+    $! = 0;
     ok(eval { require Data::Dumper; }, "require Data::Dumper");
+
     if ($abi_version >= 4) {
-        ok(
-            defined IO::Socket::INET->new(
-                LocalPort => 33333,
-                Proto     => 'tcp',
-            ),
-            "socket created"
-        );
-        ok(
-            !defined IO::Socket::INET->new(
-                LocalPort => 33334,
-                Proto     => 'tcp',
-            ),
-            "socket not created: $!"
-        );
+        ok(defined IO::Socket::INET->new(LocalPort  => 33333, Proto => 'tcp',), "socket created");
+        ok(!defined IO::Socket::INET->new(LocalPort => 33334, Proto => 'tcp',), "socket not created: $!");
     }
     for (@INC) {
         next unless -d $_;
@@ -59,9 +52,11 @@ if ($abi_version < 0) {
     ok($ruleset2->add_path_beneath_rule("$base/a", qw(read_file)), "allow read_file on $base/a");
     ok($ruleset2->apply(),                                         "apply ruleset");
     ok(-r "$base/b",                                               "technically readable: $base/b");
-    # this fails if . was added to @INC
-    if (!grep { '.' } @INC) {
+    # this test would fail if . was added to @INC
+    if (!grep { $_ eq '.' } @INC) {
+        $! = 0;
         ok(!defined IO::File->new("$base/b", 'r'), "no longer readable: $base/b");
+        ok($!{EACCES},                             "correct error: $!");
     }
     ok(defined IO::File->new("$base/a", 'r'), "still readable: $base/a...");
     is(system("/usr/bin/cat $base/a"), -1, "...but no permission to run cat");

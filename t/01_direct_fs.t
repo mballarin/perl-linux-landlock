@@ -7,7 +7,7 @@ use IO::File;
 use File::Basename;
 use Linux::Landlock::Direct qw(:functions :constants set_no_new_privs);
 
-my $base = dirname(__FILE__) . '/data';
+my $base        = dirname(__FILE__) . '/data';
 my $abi_version = ll_get_abi_version();
 if ($abi_version < 0) {
     ok(!defined ll_create_fs_ruleset(), "ruleset created");
