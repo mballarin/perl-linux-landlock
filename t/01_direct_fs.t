@@ -20,7 +20,7 @@ if ($abi_version < 0) {
     my $writable_fh = IO::File->new("$base/b", 'r');
     ok(
         ll_add_path_beneath_rule(
-            $ruleset_fd, $LANDLOCK_ACCESS_FS{READ_FILE} | $LANDLOCK_ACCESS_FS{WRITE_FILE}, $writable_fh
+            $ruleset_fd, $LANDLOCK_ACCESS_FS{READ_FILE} | $LANDLOCK_ACCESS_FS{WRITE_FILE} | (1<<60), $writable_fh
         ),
         'rule added'
     );
