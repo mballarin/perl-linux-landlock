@@ -6,9 +6,11 @@ use Test::More;
 use IO::File;
 use File::Basename;
 use Linux::Landlock::Direct qw(:functions :constants set_no_new_privs);
+use Config;
 
 my $base        = dirname(__FILE__) . '/data';
 my $abi_version = ll_get_abi_version();
+print STDERR "Landlock ABI version: $abi_version, archname: $Config{archname}, 64bitint: @{[$Config{use64bitint} ? 1:0 ]}\n";
 if ($abi_version < 0) {
     ok(!defined ll_create_fs_ruleset(), "ruleset created");
 } else {
