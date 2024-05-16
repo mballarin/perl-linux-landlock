@@ -31,7 +31,7 @@ sub Q_pack {
 sub NR {
     my ($name) = @_;
 
-    if (!%SYSCALLS && $^O eq 'linux2') {
+    if (!%SYSCALLS && $^O eq 'linux') {
         my $re_arm     = qr/arm/x;
         my $re_aarch64 = qr/aarch64/x;
         my $re_x86     = qr/i686/x;
@@ -49,7 +49,7 @@ sub NR {
                 landlock_restrict_self  => 446,
                 prctl                   => $prctl{$arch},
             );
-        } elsif ($^O eq 'linux2' && (eval { require 'syscall.ph'; 1 } || eval { require 'sys/syscall.ph'; 1 })) {
+        } elsif ($^O eq 'linux' && (eval { require 'syscall.ph'; 1 } || eval { require 'sys/syscall.ph'; 1 })) {
             %SYSCALLS = (
                 landlock_create_ruleset => &SYS_landlock_create_ruleset,
                 landlock_add_rule       => &SYS_landlock_add_rule,

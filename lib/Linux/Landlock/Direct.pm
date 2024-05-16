@@ -55,12 +55,12 @@ Returns the file descriptor of the new ruleset on success, or undef on error.
 
 Int (file descriptor), like L</ll_create_fs_ruleset(@actions)>, but for network actions.
 
-This requires an ABI version of at least 4.
+This requires an ABI version of at least 4. Returns undef on error.
 
 =item ll_create_ruleset($fs_actions, $net_actions)
 
 Int (file descriptor), creates a new Landlock ruleset that can cover file system
-and network actions at the same time.
+and network actions at the same time. Returns undef on error.
 
 =item ll_add_path_beneath_rule($ruleset_fd, $allowed_access, $parent)
 
@@ -177,7 +177,7 @@ use List::Util                qw(reduce);
 use POSIX                     qw();
 use Linux::Landlock::Syscalls qw(NR Q_pack);
 
-our $VERSION = '0.5';
+our $VERSION = '0.6';
 # adapted from linux/landlock.ph, architecture independent consts
 my $LANDLOCK_CREATE_RULESET_VERSION = (1 << 0);
 our %LANDLOCK_ACCESS_FS = (
