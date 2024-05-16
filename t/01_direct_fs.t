@@ -13,7 +13,7 @@ my $abi_version = ll_get_abi_version();
 print STDERR
   "Landlock ABI version: $abi_version, archname: $Config{archname}, 64bitint: @{[$Config{use64bitint} ? 1:0 ]}\n";
 if ($abi_version < 0) {
-    ok(!defined ll_create_fs_ruleset(), "ruleset created");
+    ok(!defined ll_create_fs_ruleset(), "no support");
 } else {
     ok($abi_version > 0,                          "Landlock available, ABI version $abi_version");
     ok(scalar ll_all_fs_access_supported() >= 13, "plausible list");

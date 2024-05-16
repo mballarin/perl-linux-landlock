@@ -266,7 +266,9 @@ sub ll_all_net_access_supported {
 }
 
 sub ll_get_abi_version {
-    $abi_version = syscall(NR('landlock_create_ruleset'), undef, 0, $LANDLOCK_CREATE_RULESET_VERSION);
+    my $nr = NR('landlock_create_ruleset')
+      or return -1;
+    $abi_version = syscall($nr, undef, 0, $LANDLOCK_CREATE_RULESET_VERSION);
     return $abi_version;
 }
 
@@ -291,7 +293,8 @@ sub ll_create_ruleset {
     if (ll_get_abi_version >= 4) {
         $allowed .= Q_pack(reduce { $a | $b } 0, @$net_actions);
     }
-    my $fd = syscall(NR('landlock_create_ruleset'), $allowed, length $allowed, 0);
+    my $nr = NR('landlock_create_ruleset') or return;
+    my $fd = syscall($nr, $allowed, length $allowed, 0);
     if ($fd >= 0) {
         return $fd;
     } else {
@@ -302,13 +305,10 @@ sub ll_create_ruleset {
 sub ll_add_path_beneath_rule {
     my ($ruleset_fd, $allowed_access, $parent) = @_;
 
-    my $fd     = ref $parent ? fileno $parent : $parent;
+    my $fd      = ref $parent ? fileno $parent : $parent;
     my $applied = $allowed_access & ll_all_fs_access_supported;
-    my $result = syscall(
-        NR('landlock_add_rule'), $ruleset_fd,
-        $LANDLOCK_RULE{PATH_BENEATH},
-        Q_pack($applied) . pack('l', $fd), 0
-    );
+    my $nr      = NR('landlock_add_rule') or return;
+    my $result  = syscall($nr, $ruleset_fd, $LANDLOCK_RULE{PATH_BENEATH}, Q_pack($applied) . pack('l', $fd), 0);
     return ($result == 0) ? $applied : undef;
 }
 
@@ -316,22 +316,21 @@ sub ll_add_net_port_rule {
     my ($ruleset_fd, $allowed_access, $port) = @_;
 
     my $applied = $allowed_access & ll_all_net_access_supported;
-    my $result = syscall(
-        NR('landlock_add_rule'), $ruleset_fd,
-        $LANDLOCK_RULE{NET_PORT},
-        Q_pack($applied) . Q_pack($port), 0
-    );
+    my $nr      = NR('landlock_add_rule') or return;
+    my $result  = syscall($nr, $ruleset_fd, $LANDLOCK_RULE{NET_PORT}, Q_pack($applied) . Q_pack($port), 0);
     return ($result == 0) ? $applied : undef;
 }
 
 sub set_no_new_privs {
     my $PR_SET_NO_NEW_PRIVS = 38;
-    return (syscall(NR('prctl'), $PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) == 0) ? 1 : undef;
+    my $nr                  = NR('prctl') or return;
+    return (syscall($nr, $PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0) == 0) ? 1 : undef;
 }
 
 sub ll_restrict_self {
     my ($ruleset_fd) = @_;
-    return (syscall(NR('landlock_restrict_self'), $ruleset_fd, 0) == 0) ? 1 : undef;
+    my $nr = NR('landlock_restrict_self') or return;
+    return (syscall($nr, $ruleset_fd, 0) == 0) ? 1 : undef;
 }
 
 1;
