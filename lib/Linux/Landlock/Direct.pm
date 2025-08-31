@@ -248,7 +248,6 @@ our @EXPORT_OK = qw(
   ll_create_ruleset
   ll_create_fs_ruleset
   ll_create_net_ruleset
-  ll_create_scoped_ruleset
   ll_add_path_beneath_rule
   ll_add_net_port_rule
   ll_all_fs_access_supported
