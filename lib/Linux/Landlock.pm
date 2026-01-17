@@ -184,7 +184,8 @@ use Linux::Landlock::Direct qw(
   ll_set_max_abi_version
   set_no_new_privs
 );
-our $VERSION = '0.9.2';
+
+our $VERSION = '0.009003';
 
 sub new {
     my ($class, %args) = @_;

@@ -206,7 +206,6 @@ use POSIX                     qw();
 use Linux::Landlock::Syscalls qw(NR Q_pack);
 use Math::BigInt;
 
-our $VERSION         = '0.9.2';
 our $MAX_ABI_VERSION = 6;
 
 # adapted from linux/landlock.ph, architecture independent consts
