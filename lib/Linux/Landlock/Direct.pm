@@ -250,8 +250,6 @@ our @EXPORT_OK = qw(
   get_no_new_privs
   ll_get_abi_version
   ll_create_ruleset
-  ll_create_fs_ruleset
-  ll_create_net_ruleset
   ll_add_path_beneath_rule
   ll_add_net_port_rule
   ll_all_fs_access_supported
@@ -330,18 +328,6 @@ sub ll_get_abi_version {
         }
     }
     return $abi_version;
-}
-
-#@deprecated
-sub ll_create_fs_ruleset {
-    my ($actions) = @_;
-    return ll_create_ruleset($actions, Math::BigInt->bzero);
-}
-
-#@deprecated
-sub ll_create_net_ruleset {
-    my ($actions) = @_;
-    return ll_create_ruleset(Math::BigInt->bzero, $actions);
 }
 
 sub ll_create_ruleset {
