@@ -54,21 +54,6 @@ This should be set to the highest version you tested with.
 If this is not used, or called with an undef argument, the maximum supported ABI
 version will be used. This means future kernels could break your application.
 
-=item ll_create_fs_ruleset(@actions)
-
-Int (file descriptor), creates a new Landlock ruleset that covers the specified file system
-actions.
-
-If no actions are specified, all supported actions are covered.
-
-Returns the file descriptor of the new ruleset on success, or undef on error.
-
-=item ll_create_net_ruleset(@actions)
-
-Int (file descriptor), like L</ll_create_fs_ruleset(@actions)>, but for network actions.
-
-This requires an ABI version of at least 4. Returns undef on error.
-
 =item ll_create_scoped_ruleset(@actions)
 
 Int (file descriptor), creates a new Landlock ruleset that covers "scoped" actions.
