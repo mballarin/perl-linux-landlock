@@ -318,10 +318,10 @@ sub ll_get_abi_version {
 sub _get_supported_actions {
     my ($fs_actions, $net_actions, $scoped_actions) = @_;
     my $allowed = Q_pack($fs_actions // ll_all_fs_access_supported());
-    if (ll_get_abi_version >= 4) {
+    if (ll_get_abi_version() >= 4) {
         $allowed .= Q_pack($net_actions // ll_all_net_access_supported());
     }
-    if (ll_get_abi_version >= 6) {
+    if (ll_get_abi_version() >= 6) {
         $allowed .= Q_pack($scoped_actions // ll_all_scoped_supported());
     }
     return $allowed;
@@ -335,13 +335,13 @@ sub ll_create_ruleset {
     if ($fd >= 0) {
         return $fd;
     } else {
-        if (ll_get_abi_version >= 6) {
-            # RHEL 9 (and derivatives) ship a broken backport of ABI 6 (RHEL-125143)
+        if (ll_get_abi_version() >= 6) {
+            # RHEL 9 (and derivatives) ship a broken backport of ABI 6 (https://issues.redhat.com/browse/RHEL-125143)
             $abi_version -= 1;
             $allowed = _get_supported_actions($fs_actions, $net_actions, $scoped_actions);
             $fd      = syscall($nr, $allowed, length $allowed, 0);
             if ($fd > 0) {
-                warn "Working around buggy RHEL kernel, scoped actions not restricted";
+                warn "Working around buggy kernel, scoped actions not restricted\n";
                 return $fd;
             }
         }
